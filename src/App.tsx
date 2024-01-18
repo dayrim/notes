@@ -1,70 +1,55 @@
 import { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import dataSource from "./database/local-data-source";
-import connection from "./database/local-database-connection"
 import "reflect-metadata";
-import { Note } from './entities/note';
-import { Capacitor } from '@capacitor/core';
+import Notes from './Notes';
+import { ElectricProvider, initElectric, dbName, DEBUG, } from './electric'
+import { Electric } from './generated/client';
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [electric, setElectric] = useState<Electric>()
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    const noteRepository = dataSource.getRepository(Note);
-    const allNotes = await noteRepository.find();
-    setNotes(allNotes);
-
-  }
-
-  async function addNote() {
-    const noteRepository = dataSource.getRepository(Note);
-    const newNote = noteRepository.create({ title: 'New note', content: 'Content of the new note' });
-    await noteRepository.save(newNote);
-    if (Capacitor.getPlatform() === 'web' && typeof dataSource.options.database === 'string') {
-      await connection.saveToStore(dataSource.options.database);
+    const init = async () => {
+      try {
+        const client = await initElectric()
+        setElectric(client)
+        const { synced } = await client.db.note.sync({})
+        await synced
+        const timeToSync = performance.now()
+        if (DEBUG) {
+          console.log(`Synced in ${timeToSync}ms from page load`)
+        }
+      } catch (error) {
+        if (
+          (error as Error).message.startsWith(
+            "Local schema doesn't match server's",
+          )
+        ) {
+          deleteDB()
+        }
+        throw error
+      }
     }
-    loadData(); // Reload notes
-  }
 
-  async function deleteNote(id: number) {
-    const noteRepository = dataSource.getRepository(Note);
-    await noteRepository.delete(id);
-    if (Capacitor.getPlatform() === 'web' && typeof dataSource.options.database === 'string') {
-      await connection.saveToStore(dataSource.options.database);
-    }
-    loadData(); // Reload notes
-  }
+    init()
+  }, [])
 
-  return (
-    <div>
-      <Button variant="contained" onClick={addNote}>Add Note</Button>
-
-      <h1>Notes</h1>
-      <List>
-        {notes.map(note => (
-          <ListItem
-            key={note.id}
-            secondaryAction={
-              <IconButton edge="end" aria-label="delete" onClick={() => deleteNote(note.id)}>
-                <DeleteIcon />
-              </IconButton>
-            }
-          >
-            <ListItemText primary={note.title} secondary={note.content} />
-          </ListItem>
-        ))}
-      </List>
-    </div>
+  return electric && (
+    <ElectricProvider db={electric}>
+      <Notes></Notes>
+    </ElectricProvider>
   );
 }
 
 export default App;
+
+function deleteDB() {
+  console.log("Deleting DB as schema doesn't match server's")
+  const DBDeleteRequest = window.indexedDB.deleteDatabase(dbName)
+  DBDeleteRequest.onsuccess = function () {
+    console.log('Database deleted successfully')
+  }
+  // the indexedDB cannot be deleted if the database connection is still open,
+  // so we need to reload the page to close any open connections.
+  // On reload, the database will be recreated.
+  window.location.reload()
+}
