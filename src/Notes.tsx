@@ -4,7 +4,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import "reflect-metadata";
 import { useElectric } from './electric'
 
 import { v4 as uuidv4 } from 'uuid'

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import "reflect-metadata";
 import Notes from './Notes';
-import { ElectricProvider, initElectric, dbName, DEBUG, } from './electric'
+import { ElectricProvider, initElectric, dbName } from './electric'
 import { Electric } from './generated/client';
 
 function App() {
@@ -14,10 +13,7 @@ function App() {
         setElectric(client)
         const { synced } = await client.db.note.sync({})
         await synced
-        const timeToSync = performance.now()
-        if (DEBUG) {
-          console.log(`Synced in ${timeToSync}ms from page load`)
-        }
+
       } catch (error) {
         if (
           (error as Error).message.startsWith(
