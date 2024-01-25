@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
-import Notes from './Notes';
+import { Notes } from './pages/Home';
 import { ElectricProvider, initElectric, dbName } from './electric'
 import { Electric } from './generated/client';
+
+import 'react-quill/dist/quill.snow.css';
+import 'react-quill/dist/quill.bubble.css';
+import './App.css';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 function App() {
   const [electric, setElectric] = useState<Electric>()
@@ -28,10 +34,16 @@ function App() {
 
     init()
   }, [])
-
+  const darkTheme = createTheme({
+    palette: {
+      mode: 'dark',
+    },
+  });
   return electric && (
     <ElectricProvider db={electric}>
-      <Notes></Notes>
+      <ThemeProvider theme={darkTheme}>
+        <Notes></Notes>
+      </ThemeProvider>
     </ElectricProvider>
   );
 }

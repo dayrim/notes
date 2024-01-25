@@ -23,6 +23,8 @@ export type Note = {
   id: string
   title: string
   content: string
+  createDate: Date | null
+  updateDate: Date | null
 }
 
 
@@ -802,18 +804,24 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string | null
     title: string | null
     content: string | null
+    createDate: Date | null
+    updateDate: Date | null
   }
 
   export type NoteMaxAggregateOutputType = {
     id: string | null
     title: string | null
     content: string | null
+    createDate: Date | null
+    updateDate: Date | null
   }
 
   export type NoteCountAggregateOutputType = {
     id: number
     title: number
     content: number
+    createDate: number
+    updateDate: number
     _all: number
   }
 
@@ -822,18 +830,24 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: true
     title?: true
     content?: true
+    createDate?: true
+    updateDate?: true
   }
 
   export type NoteMaxAggregateInputType = {
     id?: true
     title?: true
     content?: true
+    createDate?: true
+    updateDate?: true
   }
 
   export type NoteCountAggregateInputType = {
     id?: true
     title?: true
     content?: true
+    createDate?: true
+    updateDate?: true
     _all?: true
   }
 
@@ -914,6 +928,8 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string
     title: string
     content: string
+    createDate: Date | null
+    updateDate: Date | null
     _count: NoteCountAggregateOutputType | null
     _min: NoteMinAggregateOutputType | null
     _max: NoteMaxAggregateOutputType | null
@@ -937,6 +953,8 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: boolean
     title?: boolean
     content?: boolean
+    createDate?: boolean
+    updateDate?: boolean
   }
 
 
@@ -1663,7 +1681,9 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
   export const NoteScalarFieldEnum: {
     id: 'id',
     title: 'title',
-    content: 'content'
+    content: 'content',
+    createDate: 'createDate',
+    updateDate: 'updateDate'
   };
 
   export type NoteScalarFieldEnum = (typeof NoteScalarFieldEnum)[keyof typeof NoteScalarFieldEnum]
@@ -1707,12 +1727,16 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: UuidFilter | string
     title?: StringFilter | string
     content?: StringFilter | string
+    createDate?: DateTimeNullableFilter | Date | string | null
+    updateDate?: DateTimeNullableFilter | Date | string | null
   }
 
   export type NoteOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    createDate?: SortOrder
+    updateDate?: SortOrder
   }
 
   export type NoteWhereUniqueInput = {
@@ -1723,6 +1747,8 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    createDate?: SortOrder
+    updateDate?: SortOrder
     _count?: NoteCountOrderByAggregateInput
     _max?: NoteMaxOrderByAggregateInput
     _min?: NoteMinOrderByAggregateInput
@@ -1735,48 +1761,64 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: UuidWithAggregatesFilter | string
     title?: StringWithAggregatesFilter | string
     content?: StringWithAggregatesFilter | string
+    createDate?: DateTimeNullableWithAggregatesFilter | Date | string | null
+    updateDate?: DateTimeNullableWithAggregatesFilter | Date | string | null
   }
 
   export type NoteCreateInput = {
     id: string
     title: string
     content: string
+    createDate?: Date | string | null
+    updateDate?: Date | string | null
   }
 
   export type NoteUncheckedCreateInput = {
     id: string
     title: string
     content: string
+    createDate?: Date | string | null
+    updateDate?: Date | string | null
   }
 
   export type NoteUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteCreateManyInput = {
     id: string
     title: string
     content: string
+    createDate?: Date | string | null
+    updateDate?: Date | string | null
   }
 
   export type NoteUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NoteUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UuidFilter = {
@@ -1806,22 +1848,39 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     not?: NestedStringFilter | string
   }
 
+  export type DateTimeNullableFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
   export type NoteCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    createDate?: SortOrder
+    updateDate?: SortOrder
   }
 
   export type NoteMaxOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    createDate?: SortOrder
+    updateDate?: SortOrder
   }
 
   export type NoteMinOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    createDate?: SortOrder
+    updateDate?: SortOrder
   }
 
   export type UuidWithAggregatesFilter = {
@@ -1857,8 +1916,26 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     _max?: NestedStringFilter
   }
 
+  export type DateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedDateTimeNullableFilter
+    _max?: NestedDateTimeNullableFilter
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type NestedUuidFilter = {
@@ -1884,6 +1961,17 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     startsWith?: string
     endsWith?: string
     not?: NestedStringFilter | string
+  }
+
+  export type NestedDateTimeNullableFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableFilter | Date | string | null
   }
 
   export type NestedUuidWithAggregatesFilter = {
@@ -1926,6 +2014,31 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     _count?: NestedIntFilter
     _min?: NestedStringFilter
     _max?: NestedStringFilter
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | null
+    notIn?: Enumerable<Date> | Enumerable<string> | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedDateTimeNullableFilter
+    _max?: NestedDateTimeNullableFilter
+  }
+
+  export type NestedIntNullableFilter = {
+    equals?: number | null
+    in?: Enumerable<number> | null
+    notIn?: Enumerable<number> | null
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntNullableFilter | number | null
   }
 
 
