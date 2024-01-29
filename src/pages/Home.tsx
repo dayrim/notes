@@ -6,30 +6,38 @@ import IconButton from '@mui/material/IconButton';
 import { useElectric } from '../electric';
 import { v4 as uuidv4 } from 'uuid'
 import { useLiveQuery } from 'electric-sql/react';
-import { Box, CssBaseline, AppBar, Toolbar, Typography, Drawer, Divider, ListItemButton, ListItemIcon } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography, Drawer, Divider, ListItemButton, ListItemIcon, TextField } from '@mui/material';
 import ReactQuill from 'react-quill';
-import throttle from 'lodash.throttle';
+import MiniSearch from 'minisearch';
 
-
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Note } from 'src/generated/client';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Note } from '../../db/generated/client';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const drawerWidth = 240;
 
 
+export type FilteredNote = {
+  id: string;
+  title: string;
+  content: string;
+  plainContent: string;
+  score: number;
+  createDate: Date | null;
+  updateDate: Date | null;
+}
 
 export const Notes = () => {
   const quillRef = useRef<ReactQuill>(null);
   const [selectedNote, setSelectedNote] = useState<Note>();
+  const [searchQuery, setSearchQuery] = useState('');
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const { db } = useElectric()!
   const { results: notes } = useLiveQuery(
     db.note.liveMany()
   );
+
   const [content, setContent] = useState<string>('<h1></h1>');
 
   const saveNote = async (content: string) => {
@@ -40,6 +48,7 @@ export const Notes = () => {
     const h1 = doc.querySelector('h1');
     let title = h1?.textContent || '';
 
+    const textContent = doc?.body?.textContent || '';0
     // Use electricSQL to update the note
     await db.note.update({
       where: {
@@ -48,16 +57,38 @@ export const Notes = () => {
       data: {
         title: title, // Updating the title
         content: content, // Updating the content
+        plainContent: textContent,
         updateDate: new Date(), // Set the current date and time
       },
     });
 
   };
-  const throttledSaveNote = useCallback(throttle(saveNote, 2000), [selectedNote]);
+  // const throttledSaveNote = useCallback(throttle(saveNote, 2000), [selectedNote]);
+  const getFilteredAndSortedNotes = useCallback(() => {
+    if (!searchQuery) return notes ?? []; // If no search query, return all notes
+
+    // Search using MiniSearch
+    console.log(miniSearch, 'miniSearch')
+    const searchResults = miniSearch.search(searchQuery);
+    console.log(searchResults, 'searchResults')
+
+
+    return searchResults.sort((a, b) => {
+      // First, sort by match score in descending order
+      const scoreDifference = b.score - a.score;
+      if (scoreDifference !== 0) return scoreDifference;
+
+      // If match scores are equal, then sort by createDate in descending order
+      const dateA = a.createDate ? new Date(a.createDate) : new Date(0); // Fallback to epoch if undefined
+      const dateB = b.createDate ? new Date(b.createDate) : new Date(0); // Fallback to epoch if undefined
+      return dateB.getTime() - dateA.getTime(); // Compare timestamps
+    });
+
+  }, [notes, searchQuery])
 
   const handleChange = (content: string) => {
     setContent(content);
-    throttledSaveNote(content);
+    saveNote(content);
   };
 
 
@@ -71,7 +102,15 @@ export const Notes = () => {
       }
     }
   }, [content]);
-
+  const miniSearch = useMemo(() => {
+    const miniSearch = new MiniSearch<Note>({
+      fields: ['title', 'plainContent'], // Use plainContent for indexing
+      storeFields: ['title', 'content', 'id', 'createDate', 'updateDate', 'plainContent'],
+      searchOptions: { fuzzy: 0.1, prefix: true }
+    });
+    miniSearch.addAll(notes ?? []);
+    return miniSearch;
+  }, [notes]);
 
   useEffect(() => {
     if (firstLoad && notes && notes?.length > 0) {
@@ -87,6 +126,7 @@ export const Notes = () => {
         id: uuidv4() as string,
         title: '',
         content: '',
+        plainContent: "",
         createDate: new Date(),
         updateDate: new Date()
       },
@@ -102,15 +142,13 @@ export const Notes = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
+
       <AppBar
         position="fixed"
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Permanent drawer
-          </Typography>
+
         </Toolbar>
       </AppBar>
       <Drawer
@@ -126,6 +164,12 @@ export const Notes = () => {
         anchor="left"
       >
         <Toolbar >
+          <TextField
+            placeholder="Search notes"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ marginLeft: 'auto' }}
+          />
           <IconButton onClick={addNote}>
             <AddIcon style={{ marginLeft: 'auto' }} />
           </IconButton>
@@ -136,23 +180,14 @@ export const Notes = () => {
         <Divider />
         <List>
 
-          {notes && notes
-            .sort((a, b) => {
-              const dateA = a.createDate ? new Date(a.createDate) : new Date(0); // Fallback to epoch if undefined
-              const dateB = b.createDate ? new Date(b.createDate) : new Date(0); // Fallback to epoch if undefined
-
-              return dateB.getTime() - dateA.getTime(); // Compare timestamps
-            })
-            .map((note, index) => (
+          {getFilteredAndSortedNotes()
+            .map((note: any) => (
               <ListItem key={note.id} disablePadding>
                 <ListItemButton
                   onClick={() => { setContent(note.content); setSelectedNote(note); }}
                   selected={selectedNote?.id === note.id}
                 >
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={note.title || "New note..."} />
+                  <ListItemText primary={note.title ? note.title.slice(0, 15) : "New note..."} />
                 </ListItemButton>
               </ListItem>
             ))}

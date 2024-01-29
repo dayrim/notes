@@ -12,7 +12,7 @@ import migrations from './migrations';
 // ENUMS
 /////////////////////////////////////////
 
-export const NoteScalarFieldEnumSchema = z.enum(['id','title','content','createDate','updateDate']);
+export const NoteScalarFieldEnumSchema = z.enum(['id','title','content','plainContent','createDate','updateDate']);
 
 export const QueryModeSchema = z.enum(['default','insensitive']);
 
@@ -31,6 +31,7 @@ export const NoteSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
   content: z.string(),
+  plainContent: z.string(),
   createDate: z.coerce.date().nullable(),
   updateDate: z.coerce.date().nullable(),
 })
@@ -48,6 +49,7 @@ export const NoteSelectSchema: z.ZodType<Prisma.NoteSelect> = z.object({
   id: z.boolean().optional(),
   title: z.boolean().optional(),
   content: z.boolean().optional(),
+  plainContent: z.boolean().optional(),
   createDate: z.boolean().optional(),
   updateDate: z.boolean().optional(),
 }).strict()
@@ -64,6 +66,7 @@ export const NoteWhereInputSchema: z.ZodType<Prisma.NoteWhereInput> = z.object({
   id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   content: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  plainContent: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createDate: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   updateDate: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
 }).strict();
@@ -72,6 +75,7 @@ export const NoteOrderByWithRelationInputSchema: z.ZodType<Prisma.NoteOrderByWit
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   content: z.lazy(() => SortOrderSchema).optional(),
+  plainContent: z.lazy(() => SortOrderSchema).optional(),
   createDate: z.lazy(() => SortOrderSchema).optional(),
   updateDate: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -84,6 +88,7 @@ export const NoteOrderByWithAggregationInputSchema: z.ZodType<Prisma.NoteOrderBy
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   content: z.lazy(() => SortOrderSchema).optional(),
+  plainContent: z.lazy(() => SortOrderSchema).optional(),
   createDate: z.lazy(() => SortOrderSchema).optional(),
   updateDate: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => NoteCountOrderByAggregateInputSchema).optional(),
@@ -98,6 +103,7 @@ export const NoteScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.NoteScal
   id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
   title: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   content: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  plainContent: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   createDate: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   updateDate: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
 }).strict();
@@ -106,6 +112,7 @@ export const NoteCreateInputSchema: z.ZodType<Prisma.NoteCreateInput> = z.object
   id: z.string().uuid(),
   title: z.string(),
   content: z.string(),
+  plainContent: z.string(),
   createDate: z.coerce.date().optional().nullable(),
   updateDate: z.coerce.date().optional().nullable()
 }).strict();
@@ -114,6 +121,7 @@ export const NoteUncheckedCreateInputSchema: z.ZodType<Prisma.NoteUncheckedCreat
   id: z.string().uuid(),
   title: z.string(),
   content: z.string(),
+  plainContent: z.string(),
   createDate: z.coerce.date().optional().nullable(),
   updateDate: z.coerce.date().optional().nullable()
 }).strict();
@@ -122,6 +130,7 @@ export const NoteUpdateInputSchema: z.ZodType<Prisma.NoteUpdateInput> = z.object
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  plainContent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updateDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
@@ -130,6 +139,7 @@ export const NoteUncheckedUpdateInputSchema: z.ZodType<Prisma.NoteUncheckedUpdat
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  plainContent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updateDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
@@ -138,6 +148,7 @@ export const NoteCreateManyInputSchema: z.ZodType<Prisma.NoteCreateManyInput> = 
   id: z.string().uuid(),
   title: z.string(),
   content: z.string(),
+  plainContent: z.string(),
   createDate: z.coerce.date().optional().nullable(),
   updateDate: z.coerce.date().optional().nullable()
 }).strict();
@@ -146,6 +157,7 @@ export const NoteUpdateManyMutationInputSchema: z.ZodType<Prisma.NoteUpdateManyM
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  plainContent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updateDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
@@ -154,6 +166,7 @@ export const NoteUncheckedUpdateManyInputSchema: z.ZodType<Prisma.NoteUncheckedU
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  plainContent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updateDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
@@ -200,6 +213,7 @@ export const NoteCountOrderByAggregateInputSchema: z.ZodType<Prisma.NoteCountOrd
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   content: z.lazy(() => SortOrderSchema).optional(),
+  plainContent: z.lazy(() => SortOrderSchema).optional(),
   createDate: z.lazy(() => SortOrderSchema).optional(),
   updateDate: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -208,6 +222,7 @@ export const NoteMaxOrderByAggregateInputSchema: z.ZodType<Prisma.NoteMaxOrderBy
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   content: z.lazy(() => SortOrderSchema).optional(),
+  plainContent: z.lazy(() => SortOrderSchema).optional(),
   createDate: z.lazy(() => SortOrderSchema).optional(),
   updateDate: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -216,6 +231,7 @@ export const NoteMinOrderByAggregateInputSchema: z.ZodType<Prisma.NoteMinOrderBy
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   content: z.lazy(() => SortOrderSchema).optional(),
+  plainContent: z.lazy(() => SortOrderSchema).optional(),
   createDate: z.lazy(() => SortOrderSchema).optional(),
   updateDate: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -490,10 +506,14 @@ export const tableSchemas = {
       ],
       [
         "title",
-        "VARCHAR"
+        "TEXT"
       ],
       [
         "content",
+        "TEXT"
+      ],
+      [
+        "plainContent",
         "TEXT"
       ],
       [

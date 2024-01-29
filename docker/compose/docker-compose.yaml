@@ -24,7 +24,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - ${POSTGRES_PORT:-5554}:5432
+      - ${POSTGRES_PORT}:5432
     volumes:
       - ~/db/data/${APP_NAME}-postgres:/var/lib/postgresql/data
 
@@ -33,13 +33,26 @@ services:
     container_name: "${APP_NAME}-sync-service"
     init: true
     environment:
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/${APP_NAME:-electric}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${APP_NAME}
       DATABASE_REQUIRE_SSL: false
       PG_PROXY_PASSWORD: ${PROXY_PASSWORD}
       LOGICAL_PUBLISHER_HOST: electric
       AUTH_MODE: insecure
     ports:
-      - ${ELECTRIC_PORT:-5133}:5133
-      - ${ELECTRIC_PROXY_PORT:-65432}:65432
+      - ${ELECTRIC_PORT}:5133
+      - ${ELECTRIC_PROXY_PORT}:65432
+    depends_on:
+      - postgres
+  backend:
+    container_name: "${APP_NAME}-backend"
+    build:
+      context: ../../auth-backend # Adjust the path according to the docker-compose file location
+      dockerfile: Dockerfile
+    environment:
+      VITE_BACKEND_PORT: ${VITE_BACKEND_PORT}
+      AUTH_SECRET: ${AUTH_SECRET}
+      POSTGRESQL_CONNECTION: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${APP_NAME}
+    ports:
+      - "${VITE_BACKEND_PORT}:${VITE_BACKEND_PORT}"
     depends_on:
       - postgres

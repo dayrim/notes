@@ -23,6 +23,7 @@ export type Note = {
   id: string
   title: string
   content: string
+  plainContent: string
   createDate: Date | null
   updateDate: Date | null
 }
@@ -804,6 +805,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string | null
     title: string | null
     content: string | null
+    plainContent: string | null
     createDate: Date | null
     updateDate: Date | null
   }
@@ -812,6 +814,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string | null
     title: string | null
     content: string | null
+    plainContent: string | null
     createDate: Date | null
     updateDate: Date | null
   }
@@ -820,6 +823,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: number
     title: number
     content: number
+    plainContent: number
     createDate: number
     updateDate: number
     _all: number
@@ -830,6 +834,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: true
     title?: true
     content?: true
+    plainContent?: true
     createDate?: true
     updateDate?: true
   }
@@ -838,6 +843,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: true
     title?: true
     content?: true
+    plainContent?: true
     createDate?: true
     updateDate?: true
   }
@@ -846,6 +852,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: true
     title?: true
     content?: true
+    plainContent?: true
     createDate?: true
     updateDate?: true
     _all?: true
@@ -928,6 +935,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string
     title: string
     content: string
+    plainContent: string
     createDate: Date | null
     updateDate: Date | null
     _count: NoteCountAggregateOutputType | null
@@ -953,6 +961,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: boolean
     title?: boolean
     content?: boolean
+    plainContent?: boolean
     createDate?: boolean
     updateDate?: boolean
   }
@@ -1682,6 +1691,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: 'id',
     title: 'title',
     content: 'content',
+    plainContent: 'plainContent',
     createDate: 'createDate',
     updateDate: 'updateDate'
   };
@@ -1727,6 +1737,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: UuidFilter | string
     title?: StringFilter | string
     content?: StringFilter | string
+    plainContent?: StringFilter | string
     createDate?: DateTimeNullableFilter | Date | string | null
     updateDate?: DateTimeNullableFilter | Date | string | null
   }
@@ -1735,6 +1746,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    plainContent?: SortOrder
     createDate?: SortOrder
     updateDate?: SortOrder
   }
@@ -1747,6 +1759,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    plainContent?: SortOrder
     createDate?: SortOrder
     updateDate?: SortOrder
     _count?: NoteCountOrderByAggregateInput
@@ -1761,6 +1774,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: UuidWithAggregatesFilter | string
     title?: StringWithAggregatesFilter | string
     content?: StringWithAggregatesFilter | string
+    plainContent?: StringWithAggregatesFilter | string
     createDate?: DateTimeNullableWithAggregatesFilter | Date | string | null
     updateDate?: DateTimeNullableWithAggregatesFilter | Date | string | null
   }
@@ -1769,6 +1783,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string
     title: string
     content: string
+    plainContent: string
     createDate?: Date | string | null
     updateDate?: Date | string | null
   }
@@ -1777,6 +1792,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string
     title: string
     content: string
+    plainContent: string
     createDate?: Date | string | null
     updateDate?: Date | string | null
   }
@@ -1785,6 +1801,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    plainContent?: StringFieldUpdateOperationsInput | string
     createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -1793,6 +1810,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    plainContent?: StringFieldUpdateOperationsInput | string
     createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -1801,6 +1819,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id: string
     title: string
     content: string
+    plainContent: string
     createDate?: Date | string | null
     updateDate?: Date | string | null
   }
@@ -1809,6 +1828,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    plainContent?: StringFieldUpdateOperationsInput | string
     createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -1817,6 +1837,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    plainContent?: StringFieldUpdateOperationsInput | string
     createDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updateDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -1863,6 +1884,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    plainContent?: SortOrder
     createDate?: SortOrder
     updateDate?: SortOrder
   }
@@ -1871,6 +1893,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    plainContent?: SortOrder
     createDate?: SortOrder
     updateDate?: SortOrder
   }
@@ -1879,6 +1902,7 @@ export type InputJsonValue = null | string | number | boolean | InputJsonObject 
     id?: SortOrder
     title?: SortOrder
     content?: SortOrder
+    plainContent?: SortOrder
     createDate?: SortOrder
     updateDate?: SortOrder
   }

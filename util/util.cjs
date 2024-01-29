@@ -5,7 +5,7 @@ require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const envrcFile = path.join(__dirname, "../.env");
 const composeFile = path.join(
   __dirname,
-  "../backend/compose/docker-compose.yaml"
+  "../docker/compose/docker-compose.yaml"
 );
 
 function dockerCompose(command, userArgs, callback) {
@@ -39,6 +39,8 @@ function electricSqlGenerate(userArgs, callback) {
     electricUrl,
     "--proxy",
     proxyUrl,
+    "--client-path",
+    "./db/generated/client",
     ...userArgs,
   ];
   const proc = spawn("electric-sql", args, { stdio: "inherit" });

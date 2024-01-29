@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Notes } from './pages/Home';
 import { ElectricProvider, initElectric, dbName } from './electric'
-import { Electric } from './generated/client';
+import { Electric } from '../db/generated/client';
+import { authClient } from './auth-client'; // Import the Feathers client
 
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 import './App.css';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import { Login } from './pages/Login';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
   const [electric, setElectric] = useState<Electric>()
 
   useEffect(() => {
+    authClient.reAuthenticate()
+      .then(() => setIsAuthenticated(true))
+      .catch(error => console.error('Re-authentication failed', error));
+
     const init = async () => {
       try {
         const client = await initElectric()
@@ -39,12 +48,47 @@ function App() {
       mode: 'dark',
     },
   });
+  const login = async (email: string, password: string) => {
+    try {
+      await authClient.authenticate({
+        strategy: 'local',
+        email,
+        password,
+      });
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Authentication failed', error);
+      // Handle errors (e.g., showing an alert or message to the user)
+    }
+  };
+
+
+  const register = async (email: string, password: string) => {
+    try {
+      // Creating a new user
+      await authClient.service('user').create({ email, password });
+      // If registration is successful, automatically log the user in
+      await login(email, password);
+    } catch (error) {
+      console.error('Registration failed', error);
+      // Handle errors (e.g., showing an alert or message to the user)
+    }
+  };
+
+
   return electric && (
-    <ElectricProvider db={electric}>
-      <ThemeProvider theme={darkTheme}>
-        <Notes></Notes>
-      </ThemeProvider>
-    </ElectricProvider>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      {isAuthenticated ? (
+        electric && (
+          <ElectricProvider db={electric}>
+            <Notes />
+          </ElectricProvider>
+        )
+      ) : (
+        <Login onLogin={login} onRegister={register} />
+      )}
+    </ThemeProvider>
   );
 }
 
