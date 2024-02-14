@@ -46,7 +46,7 @@ services:
   backend:
     container_name: "${APP_NAME}-backend"
     build:
-      context: ../../auth-backend # Adjust the path according to the docker-compose file location
+      context: ../../auth-backend
       dockerfile: Dockerfile
     environment:
       VITE_BACKEND_PORT: ${VITE_BACKEND_PORT}

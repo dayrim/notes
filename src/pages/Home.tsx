@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { useLiveQuery } from 'electric-sql/react';
 import { Box, AppBar, Toolbar, Typography, Drawer, Divider, ListItemButton, ListItemIcon, TextField } from '@mui/material';
 import ReactQuill from 'react-quill';
-import MiniSearch from 'minisearch';
+import MiniSearch, { SearchResult } from 'minisearch';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Note } from '../../db/generated/client';
@@ -18,15 +18,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 const drawerWidth = 240;
 
 
-export type FilteredNote = {
-  id: string;
-  title: string;
-  content: string;
-  plainContent: string;
-  score: number;
-  createDate: Date | null;
-  updateDate: Date | null;
-}
 
 export const Notes = () => {
   const quillRef = useRef<ReactQuill>(null);
@@ -34,10 +25,52 @@ export const Notes = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const { db } = useElectric()!
-  const { results: notes } = useLiveQuery(
+  const { results: dbNotes } = useLiveQuery(
     db.note.liveMany()
   );
+  const [notes, setNotes] = useState<Note[]>()
 
+  const miniSearch = useMemo(() => {
+    const miniSearch = new MiniSearch<Note>({
+      fields: ['title', 'plainContent'], // Use plainContent for indexing
+      storeFields: ['title', 'content', 'id', 'createDate', 'updateDate', 'plainContent'],
+      searchOptions: { fuzzy: 0.1, prefix: true }
+    });
+    return miniSearch;
+  }, []);
+  useEffect(() => {
+    if (!searchQuery) {
+      const sortedNotes = (dbNotes || []).sort((a, b) => {
+        const dateA = a.createDate ? new Date(a.createDate) : new Date(0);
+        const dateB = b.createDate ? new Date(b.createDate) : new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      })
+      setNotes(sortedNotes);
+      return;
+    }
+    miniSearch.removeAll();
+    miniSearch.addAll(dbNotes ?? []);
+    const searchResults: Note[] | SearchResult[] = miniSearch.search(searchQuery);
+    searchResults.sort((a, b) => {
+      // First, sort by match score in descending order
+      const scoreDifference = b.score - a.score;
+      if (scoreDifference !== 0) return scoreDifference;
+
+      // If match scores are equal, then sort by createDate in descending order
+      const dateA = a.createDate ? new Date(a.createDate) : new Date(0); // Fallback to epoch if undefined
+      const dateB = b.createDate ? new Date(b.createDate) : new Date(0); // Fallback to epoch if undefined
+      return dateB.getTime() - dateA.getTime(); // Compare timestamps
+    })
+
+    setNotes(searchResults.map(result => ({
+      id: result.id,
+      title: result.title,
+      content: result.content,
+      plainContent: result.plainContent,
+      createDate: result.createDate,
+      updateDate: result.updateDate,
+    })));
+  }, [dbNotes, searchQuery, miniSearch])
   const [content, setContent] = useState<string>('<h1></h1>');
 
   const saveNote = async (content: string) => {
@@ -48,7 +81,7 @@ export const Notes = () => {
     const h1 = doc.querySelector('h1');
     let title = h1?.textContent || '';
 
-    const textContent = doc?.body?.textContent || '';0
+    const textContent = doc?.body?.textContent || ''; 0
     // Use electricSQL to update the note
     await db.note.update({
       where: {
@@ -63,28 +96,6 @@ export const Notes = () => {
     });
 
   };
-  // const throttledSaveNote = useCallback(throttle(saveNote, 2000), [selectedNote]);
-  const getFilteredAndSortedNotes = useCallback(() => {
-    if (!searchQuery) return notes ?? []; // If no search query, return all notes
-
-    // Search using MiniSearch
-    console.log(miniSearch, 'miniSearch')
-    const searchResults = miniSearch.search(searchQuery);
-    console.log(searchResults, 'searchResults')
-
-
-    return searchResults.sort((a, b) => {
-      // First, sort by match score in descending order
-      const scoreDifference = b.score - a.score;
-      if (scoreDifference !== 0) return scoreDifference;
-
-      // If match scores are equal, then sort by createDate in descending order
-      const dateA = a.createDate ? new Date(a.createDate) : new Date(0); // Fallback to epoch if undefined
-      const dateB = b.createDate ? new Date(b.createDate) : new Date(0); // Fallback to epoch if undefined
-      return dateB.getTime() - dateA.getTime(); // Compare timestamps
-    });
-
-  }, [notes, searchQuery])
 
   const handleChange = (content: string) => {
     setContent(content);
@@ -102,15 +113,7 @@ export const Notes = () => {
       }
     }
   }, [content]);
-  const miniSearch = useMemo(() => {
-    const miniSearch = new MiniSearch<Note>({
-      fields: ['title', 'plainContent'], // Use plainContent for indexing
-      storeFields: ['title', 'content', 'id', 'createDate', 'updateDate', 'plainContent'],
-      searchOptions: { fuzzy: 0.1, prefix: true }
-    });
-    miniSearch.addAll(notes ?? []);
-    return miniSearch;
-  }, [notes]);
+
 
   useEffect(() => {
     if (firstLoad && notes && notes?.length > 0) {
@@ -131,14 +134,33 @@ export const Notes = () => {
         updateDate: new Date()
       },
     });
-    setSelectedNote(note)
+    setSelectedNote(note);
+    setContent(note.content);
   }
-  async function deleteNote() { // assuming ID is a string UUID
+  const deleteNote = useCallback(async () => {
     if (selectedNote) {
+      // Delete the note from the database
       await db.note.delete({ where: { id: selectedNote?.id } });
 
+      // Proceed only if there are notes and more than one note exists
+      if (notes?.length && notes.length > 1) {
+        const index = notes.findIndex(note => note.id === selectedNote.id);
+
+        // Use a ternary operator to simplify the selection of the new note
+        // This selects the next note if available, otherwise the previous one
+        const newIndex = (index < notes.length - 1) ? index + 1 : index - 1;
+
+        // Ensuring the new index is within bounds in case of edge cases
+        const newSelectedNote = notes[newIndex >= 0 ? newIndex : 0];
+
+        // Update the selected note state and its content
+        setSelectedNote(newSelectedNote);
+        setContent(newSelectedNote.content);
+      }
     }
-  }
+
+  }, [selectedNote, notes]);
+
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -180,8 +202,8 @@ export const Notes = () => {
         <Divider />
         <List>
 
-          {getFilteredAndSortedNotes()
-            .map((note: any) => (
+          {!!notes && notes
+            .map((note) => (
               <ListItem key={note.id} disablePadding>
                 <ListItemButton
                   onClick={() => { setContent(note.content); setSelectedNote(note); }}
@@ -200,7 +222,6 @@ export const Notes = () => {
       >
         <Toolbar />
         <Typography paragraph>
-          {/* {selectedNote && selectedNote.content} */}
           <ReactQuill
             ref={quillRef}
             value={content}
